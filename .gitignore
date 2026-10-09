@@ -1,2 +1,6 @@
-*/.env
-*/.vscode
+.env
+.vscode/
+node_modules/
+venv/
+unscroll/
+__pycache__/
