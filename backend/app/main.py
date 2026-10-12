@@ -18,7 +18,7 @@ app.add_middleware(
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 
-@app.get("/api/health")
+@app.api_route("/api/health", methods=["GET", "HEAD"])
 def health_check():
     return {"status": "ok"}
 

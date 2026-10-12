@@ -127,14 +127,14 @@ async def call_huggingface_model(category: MissionCategory, duration_minutes: in
     if not settings.HF_TOKEN:
         return None
 
-    hf_url = "https://router.huggingface.co/hf-inference/v1/chat/completions"
+    model_id = settings.HF_MODEL or "google/gemma-2-2b-it"
     user_prompt = build_user_prompt(category, duration_minutes, user_notes)
     headers = {
         "Authorization": f"Bearer {settings.HF_TOKEN}",
         "Content-Type": "application/json",
     }
     payload = {
-        "model": settings.HF_MODEL or "google/gemma-2-2b-it",
+        "model": model_id,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_prompt},
@@ -143,18 +143,52 @@ async def call_huggingface_model(category: MissionCategory, duration_minutes: in
         "temperature": 0.7,
     }
 
+    # Attempt 1: Chat Completions endpoints (Model-specific and Router)
+    chat_endpoints = [
+        f"https://api-inference.huggingface.co/models/{model_id}/v1/chat/completions",
+        "https://router.huggingface.co/hf-inference/v1/chat/completions",
+    ]
+
+    for hf_url in chat_endpoints:
+        try:
+            async with httpx.AsyncClient(timeout=35.0) as client:
+                resp = await client.post(hf_url, headers=headers, json=payload)
+                if resp.status_code == 200:
+                    body = resp.json()
+                    raw_response = body.get("choices", [{}])[0].get("message", {}).get("content", "")
+                    cleaned = raw_response.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+                    return json.loads(cleaned)
+                else:
+                    print(f"[Hugging Face API {hf_url} Notice {resp.status_code}]: {resp.text}")
+        except Exception as exc:
+            print(f"[Hugging Face API {hf_url} Notice]: Request failed ({exc}).")
+
+    # Attempt 2: Raw text-generation endpoint fallback
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.post(hf_url, headers=headers, json=payload)
+        raw_url = f"https://api-inference.huggingface.co/models/{model_id}"
+        async with httpx.AsyncClient(timeout=35.0) as client:
+            resp = await client.post(
+                raw_url,
+                headers=headers,
+                json={
+                    "inputs": f"{SYSTEM_PROMPT}\n\nUser request: {user_prompt}",
+                    "parameters": {"max_new_tokens": 512, "temperature": 0.7},
+                },
+            )
             if resp.status_code == 200:
-                body = resp.json()
-                raw_response = body.get("choices", [{}])[0].get("message", {}).get("content", "")
-                cleaned = raw_response.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-                return json.loads(cleaned)
+                data = resp.json()
+                if isinstance(data, list) and len(data) > 0:
+                    gen_text = data[0].get("generated_text", "")
+                    gen_text = gen_text.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+                    if "{" in gen_text and "}" in gen_text:
+                        start = gen_text.find("{")
+                        end = gen_text.rfind("}") + 1
+                        return json.loads(gen_text[start:end])
             else:
-                print(f"[Hugging Face API Notice {resp.status_code}]: {resp.text}")
+                print(f"[Hugging Face Raw API Notice {resp.status_code}]: {resp.text}")
     except Exception as exc:
-        print(f"[Hugging Face API Notice]: Request failed ({exc}).")
+        print(f"[Hugging Face Raw API Notice]: Request failed ({exc}).")
+
     return None
 
 async def call_gemma_model(category: MissionCategory, duration_minutes: int, user_notes: str | None) -> dict[str, Any] | None:

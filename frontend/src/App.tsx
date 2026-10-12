@@ -6,6 +6,7 @@ import OutsideView from './components/OutsideView'
 import CompleteView from './components/CompleteView'
 import JourneyView from './components/JourneyView'
 import Footer from './components/Footer'
+import { getApiUrl } from './api'
 import type {
   AppState,
   Action,
@@ -534,7 +535,7 @@ export default function App() {
     setIsGeneratingMission(true)
     try {
       const dur = state.selectedTime === '5m' ? 5 : state.selectedTime === '15m' ? 15 : 30
-      const res = await fetch('/api/missions/generate', {
+      const res = await fetch(getApiUrl('/api/missions/generate'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ category: 'nature', duration_minutes: dur }),

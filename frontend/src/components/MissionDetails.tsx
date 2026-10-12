@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import type { MissionItem } from '../types/mission'
+import { getApiUrl } from '../api'
 
 interface MissionDetailsProps {
   mission: MissionItem
@@ -47,7 +48,7 @@ export default function MissionDetails({
 
     try {
       // 1. Request narration from FastAPI backend
-      const response = await fetch('/api/voice/narrate', {
+      const response = await fetch(getApiUrl('/api/voice/narrate'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: missionText }),

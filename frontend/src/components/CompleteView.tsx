@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { getApiUrl } from '../api'
 
 interface CompleteViewProps {
   completedDurationMinutes: number
@@ -94,7 +95,7 @@ export default function CompleteView({
       const formData = new FormData()
       formData.append('audio', audioBlob, 'recording.webm')
 
-      const response = await fetch('/api/voice/transcribe', {
+      const response = await fetch(getApiUrl('/api/voice/transcribe'), {
         method: 'POST',
         body: formData,
       })

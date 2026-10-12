@@ -31,9 +31,9 @@ JOURNEY_DB: dict[str, Any] = {
 # -----------------------------------------------------------------
 # 1. Missions API
 # -----------------------------------------------------------------
-@router.get("/api/missions/status")
-@router.get("/api/missions/ollama-status")
-@router.get("/missions/ollama-status")
+@router.api_route("/api/missions/status", methods=["GET", "HEAD"])
+@router.api_route("/api/missions/ollama-status", methods=["GET", "HEAD"])
+@router.api_route("/missions/ollama-status", methods=["GET", "HEAD"])
 async def get_missions_ai_status():
     """
     Checks connection to active AI providers (Hugging Face / Ollama).
