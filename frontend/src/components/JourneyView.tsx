@@ -7,6 +7,7 @@ interface JourneyViewProps {
   lastSevenDays: DayActivity[]
   reflections: ReflectionEntry[]
   onNewMission: () => void
+  onResetJourney?: () => void
 }
 
 export default function JourneyView({
@@ -16,6 +17,7 @@ export default function JourneyView({
   lastSevenDays,
   reflections,
   onNewMission,
+  onResetJourney,
 }: JourneyViewProps) {
   return (
     <div className="journey-screen">
@@ -28,9 +30,25 @@ export default function JourneyView({
           </p>
         </div>
 
-        <button type="button" className="btn-primary" onClick={onNewMission}>
-          Start new mission
-        </button>
+        <div className="journey-header-actions">
+          <button type="button" className="btn-primary" onClick={onNewMission}>
+            Start new mission
+          </button>
+          {onResetJourney && (totalMinutes > 0 || completedMissionsCount > 0 || reflections.length > 0) && (
+            <button
+              type="button"
+              className="btn-text btn-reset-stats"
+              onClick={() => {
+                if (window.confirm('Reset all saved outdoor journey progress and reflections?')) {
+                  onResetJourney()
+                }
+              }}
+              title="Clear journey history from local storage"
+            >
+              Reset data
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Top 3 Stats Metrics */}
@@ -52,9 +70,9 @@ export default function JourneyView({
         </div>
 
         <div className="journey-metric-card">
-          <div className="metric-icon-wrap">🔥</div>
+          <div className="metric-icon-wrap">{streakCount > 0 ? '🔥' : '🌱'}</div>
           <div className="metric-info">
-            <span className="metric-num">{streakCount} Days</span>
+            <span className="metric-num">{streakCount} {streakCount === 1 ? 'Day' : 'Days'}</span>
             <span className="metric-sub">Daily Consistency Streak</span>
           </div>
         </div>

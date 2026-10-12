@@ -48,7 +48,7 @@ export default function Navbar({
           onClick={() => onSelectView('journey')}
           title="View your streak & journey"
         >
-          🔥 {streakCount} Day Streak
+          {streakCount > 0 ? `🔥 ${streakCount} Day Streak` : '🌱 0 Day Streak'}
         </button>
       </div>
     </header>

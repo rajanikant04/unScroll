@@ -741,6 +741,24 @@
   flex-wrap: wrap;
 }
 
+.journey-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-reset-stats {
+  color: #7b8f82;
+  font-size: 13.5px;
+  padding: 10px 14px;
+  transition: color 0.2s ease;
+}
+
+.btn-reset-stats:hover {
+  color: #f87171;
+}
+
 .journey-title {
   margin-bottom: 12px;
 }
@@ -1153,3 +1171,33 @@
     text-align: center;
   }
 }
+
+/* Offline Badge & Safety Notice */
+.offline-badge {
+  background: rgba(220, 38, 38, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  animation: pulse-glow 2.5s infinite ease-in-out;
+}
+
+.safety-stationary-notice {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fde68a;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 16px 0 24px;
+  max-width: 480px;
+  text-align: center;
+}
+

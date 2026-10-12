@@ -5,12 +5,14 @@ interface MissionDetailsProps {
   mission: MissionItem
   onStartMission: () => void
   onAnotherMission: () => void
+  isGenerating?: boolean
 }
 
 export default function MissionDetails({
   mission,
   onStartMission,
   onAnotherMission,
+  isGenerating = false,
 }: MissionDetailsProps) {
   const [isNarrating, setIsNarrating] = useState<boolean>(false)
   const [isLoadingAudio, setIsLoadingAudio] = useState<boolean>(false)
@@ -133,8 +135,13 @@ export default function MissionDetails({
           )}
         </button>
 
-        <button type="button" className="btn-text" onClick={onAnotherMission}>
-          Another mission
+        <button
+          type="button"
+          className="btn-text"
+          onClick={onAnotherMission}
+          disabled={isGenerating}
+        >
+          {isGenerating ? '✨ Generating with Gemma 2...' : 'Another mission'}
         </button>
       </div>
     </div>
